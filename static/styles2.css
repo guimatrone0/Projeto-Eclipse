@@ -1,0 +1,105 @@
+/* styles.css para página de admin */
+
+.charts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.charts canvas {
+  width: 300px !important;
+  height: 300px !important;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f7fa;
+  margin: 0;
+  padding: 20px;
+  color: #333;
+}
+
+.container {
+  max-width: 1000px;
+  width: 95%;
+  margin: 0 auto;
+  background: white;
+  padding: 25px 35px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-weight: 700;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 1rem;
+}
+
+th, td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  vertical-align: middle;
+}
+
+th {
+  background-color: #007bff;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+}
+
+tbody tr:hover {
+  background-color: #e9f2ff;
+  cursor: default;
+}
+
+/* Responsividade */
+@media (max-width: 700px) {
+  .container {
+    padding: 15px 20px;
+  }
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  thead tr {
+    display: none;
+  }
+  tbody tr {
+    margin-bottom: 20px;
+    border: 1px solid #007bff;
+    border-radius: 6px;
+    padding: 10px;
+  }
+  tbody td {
+    border: none;
+    padding: 8px 12px;
+    position: relative;
+    padding-left: 50%;
+    text-align: left;
+  }
+  tbody td::before {
+    position: absolute;
+    top: 8px;
+    left: 15px;
+    width: 45%;
+    white-space: nowrap;
+    font-weight: 600;
+    color: #007bff;
+  }
+  tbody td:nth-of-type(1)::before { content: "ID"; }
+  tbody td:nth-of-type(2)::before { content: "Nota"; }
+  tbody td:nth-of-type(3)::before { content: "Resolvido"; }
+  tbody td:nth-of-type(4)::before { content: "Queixa"; }
+  tbody td:nth-of-type(5)::before { content: "Recomendaria"; }
+}

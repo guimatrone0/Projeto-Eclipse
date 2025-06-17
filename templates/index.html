@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pesquisa de Satisfação</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Pesquisa de Satisfação</h1>
+  </header>
+
+  <div class="chatbox" id="chatbox"></div>
+  <div class="input-area" id="input-area"></div>
+
+  <footer>
+    <p>&copy; 2025 - Todos os direitos reservados</p>
+  </footer>
+
+  <script>
+    let respostas = [];
+    let perguntaAtual = 0;
+
+    async function enviarResposta(resposta) {
+      const chatbox = document.getElementById('chatbox');
+      chatbox.innerHTML += `<div class="message user">${resposta}</div>`;
+      respostas.push(resposta);
+
+      const res = await fetch('/perguntas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ respostas })
+      });
+
+      const data = await res.json();
+
+      if (data.erro) {
+        alert(data.erro);
+        respostas.pop();
+        return;
+      }
+
+      if (data.solicitar_queixa) {
+        chatbox.innerHTML += `<div class="message bot">Por favor, registre sua queixa:</div>`;
+        renderQueixa();
+        return;
+      }
+
+      if (data.pergunta) {
+        chatbox.innerHTML += `<div class="message bot">${data.pergunta}</div>`;
+        perguntaAtual++;
+        renderInput(perguntaAtual);
+      }
+
+      if (data.finalizado) {
+        chatbox.innerHTML += `<div class="message bot">${data.mensagem}</div>`;
+        document.getElementById('input-area').innerHTML = '';
+      }
+    }
+
+    function renderInput(index) {
+      const inputArea = document.getElementById('input-area');
+      inputArea.innerHTML = '';
+
+      if (index === 0) {
+        inputArea.innerHTML = `
+          <input type="number" id="resposta" min="1" max="10" placeholder="Digite de 1 a 10" />
+          <button onclick="validarNumero()">Enviar</button>
+        `;
+      } else if (index === 1 || index === 2) {
+        inputArea.innerHTML = `
+          <button onclick="enviarResposta('Sim')">Sim</button>
+          <button onclick="enviarResposta('Não')">Não</button>
+        `;
+      }
+    }
+
+    function renderQueixa() {
+      const inputArea = document.getElementById('input-area');
+      inputArea.innerHTML = `
+        <textarea id="queixa" maxlength="500" rows="4" placeholder="Descreva sua queixa...(até 500 carcteres)."></textarea><br>
+        <button onclick="enviarQueixa()">Enviar Queixa</button>
+      `;
+    }
+
+    function validarNumero() {
+      const valor = document.getElementById('resposta').value;
+      if (valor >= 1 && valor <= 10) {
+        enviarResposta(valor);
+      } else {
+        alert("Por favor, digite um número entre 1 e 10.");
+      }
+    }
+
+    function enviarQueixa() {
+      const texto = document.getElementById('queixa').value.trim();
+      if (texto.length < 5) {
+        alert("Por favor, descreva melhor sua queixa.");
+        return;
+      }
+      enviarResposta(texto);
+    }
+
+    window.onload = async () => {
+      const res = await fetch('/perguntas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ respostas: [] })
+      });
+      const data = await res.json();
+      document.getElementById('chatbox').innerHTML += `<div class="message bot">${data.pergunta}</div>`;
+      renderInput(perguntaAtual);
+    };
+  </script>
+</body>
+</html>

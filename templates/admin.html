@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Administração dos Feedbacks</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f9f9f9;
+  }
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: center;
+  }
+  th {
+    background-color: #007bff;
+    color: white;
+  }
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  .charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+    margin: 40px auto;
+    max-width: 1000px;
+  }
+  .chart-box {
+    background: white;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    padding: 20px;
+    border-radius: 8px;
+    width: 320px;
+    height: 320px;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<h1>Feedbacks Recebidos</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nota</th>
+      <th>Resolvido</th>
+      <th>Queixa</th>
+      <th>Recomendaria</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for f in feedbacks %}
+    <tr>
+      <td>{{ f.id }}</td>
+      <td>{{ f.nota }}</td>
+      <td>{{ f.resolvido }}</td>
+      <td>{{ f.queixa }}</td>
+      <td>{{ f.recomendaria }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="charts-container">
+  <div class="chart-box">
+    <canvas id="chartNotas"></canvas>
+  </div>
+  <div class="chart-box">
+    <canvas id="chartResolvido"></canvas>
+  </div>
+  <div class="chart-box">
+    <canvas id="chartRecomendaria"></canvas>
+  </div>
+</div>
+
+<script>
+  const contagemNotas = {{ contagem_notas | tojson | safe }};
+  const contagemResolvidos = {{ contagem_resolvidos | tojson | safe }};
+  const contagemRecomendariam = {{ contagem_recomendariam | tojson | safe }};
+
+  function criarGraficoPizza(ctx, labels, data, title) {
+    return new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: title,
+          data: data,
+          backgroundColor: [
+            '#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' },
+          title: { display: true, text: title }
+        }
+      }
+    });
+  }
+
+  criarGraficoPizza(
+    document.getElementById('chartNotas').getContext('2d'),
+    Object.keys(contagemNotas),
+    Object.values(contagemNotas),
+    'Distribuição das Notas'
+  );
+
+  criarGraficoPizza(
+    document.getElementById('chartResolvido').getContext('2d'),
+    Object.keys(contagemResolvidos),
+    Object.values(contagemResolvidos),
+    'Problemas Resolvidos'
+  );
+
+  criarGraficoPizza(
+    document.getElementById('chartRecomendaria').getContext('2d'),
+    Object.keys(contagemRecomendariam),
+    Object.values(contagemRecomendariam),
+    'Recomendação do Serviço'
+  );
+</script>
+
+</body>
+</html>
